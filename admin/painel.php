@@ -1,5 +1,20 @@
 <?php
-// Painel de administração
+session_start();
+if(!isset($_SESSION['usuario'])){
+    // Voltar
+    header("Location: index.php");
+    die();
+}
+
+// Puxar os produtos
+require_once("actions/classes/Produto.class.php");
+$p = new Produto;
+$lista_produtos = $p->Listar();
+// Puxar as categorias 
+require_once("actions/classes/Categoria.class.php");
+$c = new Categoria;
+$lista_categorias = $c->Listar();
+
 
 ?>
 <!DOCTYPE html>
@@ -25,7 +40,7 @@
         <div class="row mb-3">
             <div class="col d-flex justify-content-end">
                 <button type="button" class="btn btn-success mx-1" data-toggle="modal" data-target="#modalCadastro"><i class="bi bi-plus-circle"></i> Cadastrar Produto</button>
-                <a class="btn btn-danger mx-1 text-white" href="#"><i class="bi bi-box-arrow-right"></i> Sair</a>
+                <a class="btn btn-danger mx-1 text-white" href="actions/sair.php"><i class="bi bi-box-arrow-right"></i> Sair</a>
             </div>
         </div>
         <table class="table table-striped table-hover">
@@ -38,27 +53,22 @@
                     <th>Categoria</th>
                     <th>Estoque</th>
                     <th>Preço</th>
+                    <th>Ação</th>
                 </tr>
             </thead>
             <tbody>
+                <?php foreach($lista_produtos as $linha) { ?>
                 <tr>
-                    <td>1</td>
-                    <td><img src="https://via.placeholder.com/150x150.png" alt="Produto 1"></td>
-                    <td>Produto 1</td>
-                    <td>Descrição do Produto 1</td>
-                    <td>Categoria 1</td>
-                    <td>10</td>
-                    <td>R$ 100,00</td>
+                    <td><?=$linha['id'];?></td>
+                    <td><img src="<?="fotos/".$linha['foto']; ?>" alt="Produto<?=$linha['id'];?>"></td>
+                    <td><?=$linha['nome'];?></td>
+                    <td><?=$linha['descricao'];?></td>
+                    <td><?=$linha['nome_categoria'];?></td>
+                    <td><?=$linha['estoque'];?></td>
+                    <td><?=$linha['preco'];?></td>
+                    <td><a href="actions/excluir_produto.php?id=<?=$linha['id']?>">Excluir</a> | <a href="editar.php?id=<?=$linha['id']?>">Editar</a></td>
                 </tr>
-                <tr>
-                    <td>2</td>
-                    <td><img src="https://via.placeholder.com/150x150.png" alt="Produto 2"></td>
-                    <td>Produto 2</td>
-                    <td>Descrição do Produto 2</td>
-                    <td>Categoria 2</td>
-                    <td>5</td>
-                    <td>R$ 50,00</td>
-                </tr>
+                <?php } ?>
             </tbody>
         </table>
 
@@ -68,6 +78,7 @@
     <div class="modal fade" id="modalCadastro" tabindex="-1" role="dialog" aria-labelledby="modalCadastroLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
+                <form action="actions/cadastrar_produto.php" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalCadastroLabel">Cadastro de Produto</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
@@ -75,25 +86,24 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
                         <div class="form-group">
                             <label for="nomeProduto">Nome</label>
-                            <input type="text" class="form-control" id="nomeProduto" placeholder="Digite o nome do produto">
+                            <input type="text" class="form-control" id="nomeProduto" name="nome" placeholder="Digite o nome do produto">
                         </div>
                         <div class="form-group">
                             <label for="fotoProduto">Foto</label>
-                            <input type="file" class="form-control-file" id="fotoProduto">
+                            <input type="file" class="form-control-file" id="fotoProduto" name="foto">
                         </div>
                         <div class="form-group">
                             <label for="descricaoProduto">Descrição</label>
-                            <textarea class="form-control" id="descricaoProduto" rows="3"></textarea>
+                            <textarea class="form-control" id="descricaoProduto" rows="3" name="descricao"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="categoriaProduto">Categoria</label>
-                            <select class="form-control" id="categoriaProduto">
-                                <option value="1">Categoria 1</option>
-                                <option value="2">Categoria 2</option>
-                                <option value="3">Categoria 3</option>
+                            <select class="form-control" id="categoriaProduto" name="id_categoria">
+                                <?php foreach($lista_categorias as $categoria)  { ?>
+                                    <option value="<?= $categoria["id"]?>"><?= $categoria["nome"];?></option>
+                                <?php } ?>
                             </select> <br>
                             <div class="row">
                                 <div class="col d-flex justify-content-end">
@@ -103,7 +113,7 @@
                         </div>
                         <div class="form-group">
                             <label for="estoqueProduto">Estoque</label>
-                            <input type="number" class="form-control" id="estoqueProduto" placeholder="Digite a quantidade em estoque">
+                            <input type="number" class="form-control" id="estoqueProduto" placeholder="Digite a quantidade em estoque" name="estoque">
                         </div>
                         <div class="form-group">
                             <label for="precoProduto">Preço</label>
@@ -111,18 +121,19 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">R$</span>
                                 </div>
-                                <input type="number" class="form-control" id="precoProduto" placeholder="Digite o preço">
+                                <input type="number" class="form-control" id="precoProduto" placeholder="Digite o preço" name="preco">
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary">Salvar</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+    <!-- Modal de Adicionar Categoria -->
     <div class="modal fade" id="modalAddCategoria" tabindex="-1" role="dialog" aria-labelledby="modalAddCategoriaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
             <div class="modal-content">
@@ -133,16 +144,16 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form action="actions/cadastrar_categoria.php" method="post">
                         <div class="form-group">
                             <label for="nomeCategoria">Nome da Categoria</label>
-                            <input type="text" class="form-control" id="nomeCategoria" placeholder="Digite o nome da categoria">
+                            <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome da categoria">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-primary">Adicionar</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary">Adicionar</button>
                 </div>
             </div>
         </div>

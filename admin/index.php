@@ -44,7 +44,7 @@
         </div>
         <div class="row justify-content-center mt-3">
             <div class="col-4 conteudo">
-                <form id="formLogin">
+                <form id="formLogin"  action="actions/validar_usuario.php" method="POST">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" aria-describedby="emailHelp" name="email">
@@ -55,14 +55,14 @@
                         <input type="password" class="form-control" id="senha" name="senha">
                     </div>
                     <div class="form-group">
-                        <button type="button" id="btnEntrar" class="form-control btn btn-primary rounded submit px-3">Entrar</button>
+                        <button type="submit" id="btnEntrar" class="form-control btn btn-primary rounded submit px-3">Entrar</button>
                     </div>
                     <div class="mb-3 mt-3">
                         <p class="text-center">Não possui conta no sistema? <a href="#" id="btnCadastroToggle">Cadastre-se</a></p>
                     </div>
                 </form>
                 <!-- Formulário de cadastro -->
-                <form id="formCadastro">
+                <form id="formCadastro" action="actions/cadastrar_usuario.php" method="POST">
                     <div class="mb-3">
                         <label for="nomeCad" class="form-label">Nome Completo:</label>
                         <input type="text" class="form-control" id="nomeCad" aria-describedby="nomeCadHelp" name="nome">
@@ -78,7 +78,7 @@
                         <input type="password" class="form-control" id="senhaCad" name="senha">
                     </div>
                     <div class="form-group">
-                        <button type="button" class="form-control btn btn-primary rounded submit px-3" id="btnCadastrar">Cadastrar</button>
+                        <button type="submit" class="form-control btn btn-primary rounded submit px-3" id="btnCadastrar">Cadastrar</button>
                     </div>
                     <div class="mb-3 mt-3">
                         <p class="text-center">Já possui conta? <a href="#" id="btnLoginToggle">Entrar</a></p>
